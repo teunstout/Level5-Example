@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
      * Observe the Livedata. If anything changes this peace of code will be triggered.
      */
     private fun observeViewModel() {
-        viewModel.reminders.observe(this, Observer {
+        viewModel.reminders.observe(this, Observer { reminders ->
             this@MainActivity.reminders.clear()
             this@MainActivity.reminders.addAll(reminders)
             reminderAdapter.notifyDataSetChanged()
