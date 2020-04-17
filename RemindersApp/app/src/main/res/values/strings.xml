@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Reminders App</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="textInput">Reminder</string>
+    <string name="textTitle">Add your reminder</string>
+    <string name="title_activity_add">addActivity</string>
+</resources>
