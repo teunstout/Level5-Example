@@ -1,6 +1,7 @@
 package com.example.remindersapp.database
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import com.example.remindersapp.model.Reminder
 
 /**
@@ -15,7 +16,7 @@ class ReminderRepository(context: Context) {
         reminderDao = reminderRoomDatabase!!.reminderDao()
     }
 
-    suspend fun getAllReminders(): List<Reminder> {
+    fun getAllReminders(): LiveData<List<Reminder>> {
         return reminderDao.getAllReminders()
     }
 
