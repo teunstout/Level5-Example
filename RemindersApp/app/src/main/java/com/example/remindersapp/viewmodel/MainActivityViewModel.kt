@@ -29,4 +29,5 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
             reminderRepository.deleteReminder(reminder)
         }
     }
+
 }
