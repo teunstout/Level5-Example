@@ -3,8 +3,10 @@ package com.example.remindersapp.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.log
 
 const val ADD_REMINDER_REQUEST_CODE = 100
 
@@ -26,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val reminders = arrayListOf<Reminder>()
     private val reminderAdapter = ReminderAdapter(reminders)
 
-// Don't need reminders repository here, because business logic is now in the viewmodel
+    // Don't need reminders repository here, because business logic is now in the viewmodel
     private val viewModel: MainActivityViewModel by viewModels()
 //    private lateinit var reminderRepository: ReminderRepository
 
@@ -45,25 +48,17 @@ class MainActivity : AppCompatActivity() {
         rvReminder.adapter = reminderAdapter
         rvReminder.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         createItemTouchHelper().attachToRecyclerView(rvReminder)
-        getRemindersFromDatabase()
-    }
-
-    private fun observeViewModel(){
-        
     }
 
     /**
-     * Get all the reminders from databased and instantiate the list with it and notify change to adapter
+     * Observe the Livedata. If anything changes this peace of code will be triggered.
      */
-    private fun getRemindersFromDatabase() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val reminders = withContext(Dispatchers.IO) {
-                reminderRepository.getAllReminders()
-            }
+    private fun observeViewModel() {
+        viewModel.reminders.observe(this, Observer {
             this@MainActivity.reminders.clear()
             this@MainActivity.reminders.addAll(reminders)
             reminderAdapter.notifyDataSetChanged()
-        }
+        })
     }
 
     /**
@@ -84,44 +79,42 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 ADD_REMINDER_REQUEST_CODE -> {
-                    val reminder = data!!.getParcelableExtra<Reminder>(EXTRA_REMINDER)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO) {
-                            reminderRepository.insertReminder(reminder)
+                    data?.let { safeData ->
+                        val reminder = safeData.getParcelableExtra<Reminder>(EXTRA_REMINDER)
+
+                        reminder?.let { safeReminder ->
+                            viewModel.insertReminder(safeReminder)
+                        } ?: run {
+                            Log.e("TAG", "Reminder is null")
+                        } ?: run {
+                            Log.e("TAG", "Null intent data recieved")
                         }
-                        getRemindersFromDatabase()
                     }
                 }
             }
         }
     }
+        /**
+         * Swipe left to delete items from the database
+         */
+        private fun createItemTouchHelper(): ItemTouchHelper {
+            val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-    /**
-     * Swipe left to delete items from the database
-     */
-    private fun createItemTouchHelper(): ItemTouchHelper {
-        val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
 
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    val reminderToDelete = reminders[position]
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val reminderToDelete = reminders[position]
-
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO) {
-                        reminderRepository.deleteReminder(reminderToDelete)
-                    }
-                    getRemindersFromDatabase()
+                    viewModel.deleteReminder(reminderToDelete)
                 }
             }
+            return ItemTouchHelper(callback)
         }
-        return ItemTouchHelper(callback)
     }
-}
