@@ -3,6 +3,7 @@ package com.example.remindersapp.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.remindersapp.R
 import com.example.remindersapp.database.ReminderRepository
 import com.example.remindersapp.model.Reminder
+import com.example.remindersapp.viewmodel.MainActivityViewModel
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -23,17 +25,19 @@ const val ADD_REMINDER_REQUEST_CODE = 100
 class MainActivity : AppCompatActivity() {
     private val reminders = arrayListOf<Reminder>()
     private val reminderAdapter = ReminderAdapter(reminders)
-    private lateinit var reminderRepository: ReminderRepository
 
+// Don't need reminders repository here, because business logic is now in the viewmodel
+    private val viewModel: MainActivityViewModel by viewModels()
+//    private lateinit var reminderRepository: ReminderRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        reminderRepository = ReminderRepository(this)
         fab.setOnClickListener { startAddActivity() }
         initViews()
+        observeViewModel()
     }
 
     private fun initViews() {
@@ -42,6 +46,10 @@ class MainActivity : AppCompatActivity() {
         rvReminder.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         createItemTouchHelper().attachToRecyclerView(rvReminder)
         getRemindersFromDatabase()
+    }
+
+    private fun observeViewModel(){
+        
     }
 
     /**

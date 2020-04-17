@@ -16,6 +16,7 @@ class ReminderRepository(context: Context) {
         reminderDao = reminderRoomDatabase!!.reminderDao()
     }
 
+    // Here we also expect the livedata to handle things
     fun getAllReminders(): LiveData<List<Reminder>> {
         return reminderDao.getAllReminders()
     }
