@@ -17,20 +17,11 @@ class ReminderRepository(context: Context) {
     }
 
     // Here we also expect the livedata to handle things
-    fun getAllReminders(): LiveData<List<Reminder>> {
-        return reminderDao.getAllReminders()
-    }
+    fun getAllReminders(): LiveData<List<Reminder>> = reminderDao.getAllReminders()
 
-    suspend fun insertReminder(reminder: Reminder) {
-        reminderDao.insertReminder(reminder)
-    }
+    suspend fun insertReminder(reminder: Reminder) = reminderDao.insertReminder(reminder)
 
-    suspend fun deleteReminder(reminder: Reminder) {
-        reminderDao.deleteReminder(reminder)
-    }
+    suspend fun deleteReminder(reminder: Reminder) = reminderDao.deleteReminder(reminder)
 
-    suspend fun updateReminder(reminder: Reminder) {
-        reminderDao.updateReminder(reminder)
-    }
-
+    suspend fun updateReminder(reminder: Reminder) = reminderDao.updateReminder(reminder)
 }

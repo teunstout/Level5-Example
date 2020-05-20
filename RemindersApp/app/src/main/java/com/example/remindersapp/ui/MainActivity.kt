@@ -18,7 +18,6 @@ const val ADD_REMINDER_REQUEST_CODE = 100
 class MainActivity : AppCompatActivity() {
     private val reminders = arrayListOf<Reminder>()
     private val reminderAdapter = ReminderAdapter(reminders)
-
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +30,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        rvReminder.layoutManager = LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
+        rvReminder.layoutManager =
+            LinearLayoutManager(this@MainActivity, RecyclerView.VERTICAL, false)
         rvReminder.adapter = reminderAdapter
         rvReminder.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         createItemTouchHelper().attachToRecyclerView(rvReminder)
@@ -77,35 +77,36 @@ class MainActivity : AppCompatActivity() {
                             viewModel.insertReminder(safeReminder)
                         } ?: run {
                             Log.e("TAG", "Reminder is null")
-                        } ?: run {
-                            Log.e("TAG", "Null intent data recieved")
                         }
+                    } ?: run {
+                        Log.e("TAG", "Null intent data recieved")
                     }
                 }
             }
         }
     }
-        /**
-         * Swipe left to delete items from the database
-         */
-        private fun createItemTouchHelper(): ItemTouchHelper {
-            val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    return false
-                }
+    /**
+     * Swipe left to delete items from the database
+     */
+    private fun createItemTouchHelper(): ItemTouchHelper {
+        val callback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    val reminderToDelete = reminders[position]
-
-                    viewModel.deleteReminder(reminderToDelete)
-                }
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
             }
-            return ItemTouchHelper(callback)
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val reminderToDelete = reminders[position]
+
+                viewModel.deleteReminder(reminderToDelete)
+            }
         }
+        return ItemTouchHelper(callback)
     }
+}

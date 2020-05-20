@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import com.example.remindersapp.R
 import com.example.remindersapp.model.Reminder
 import kotlinx.android.synthetic.main.activity_add.*
-
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val EXTRA_REMINDER = "EXTRA_REMINDER"
